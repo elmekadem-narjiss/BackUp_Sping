@@ -1,0 +1,82 @@
+version: '3.9'
+
+services:
+  discovery-service:
+    image: discovery-service:latest   # Mise à jour pour utiliser l'image construite
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_APPLICATION_NAME=Discovery-Service
+      - SERVER_PORT=8761
+      - EUREKA_CLIENT_FETCH_REGISTRY=true
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=true
+    networks:
+      - lab-network
+
+  gateway-service:
+    image: gateway-service:latest    # Mise à jour pour utiliser l'image construite
+    container_name: gateway-service
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_APPLICATION_NAME=Gateway-Service
+      - SERVER_PORT=8888
+      - SPRING_CLOUD_DISCOVERY_ENABLED=true
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+    networks:
+      - lab-network
+
+  chercheur-service:
+    image: chercheur-service:latest   # Mise à jour pour utiliser l'image construite
+    container_name: chercheur-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_APPLICATION_NAME=Chercheur-Service
+      - SERVER_PORT=8082
+      - SPRING_CLOUD_DISCOVERY_ENABLED=true
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+    networks:
+      - lab-network
+
+  enseignant-service:
+    image: enseignant-service:latest   # Mise à jour pour utiliser l'image construite
+    container_name: enseignant-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_APPLICATION_NAME=Enseignant-Service
+      - SERVER_PORT=8081
+      - SPRING_CLOUD_DISCOVERY_ENABLED=true
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+    networks:
+      - lab-network
+
+  projet-service:
+    image: projet-service:latest   # Mise à jour pour utiliser l'image construite
+    container_name: projet-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_APPLICATION_NAME=Projet-Service
+      - SERVER_PORT=8083
+      - SPRING_CLOUD_DISCOVERY_ENABLED=true
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+    networks:
+      - lab-network
+
+  security-service:
+    image: security-service:latest   # Mise à jour pour utiliser l'image construite
+    container_name: security-service
+    environment:
+      - SPRING_APPLICATION_NAME=Security_Microservice
+      - SPRING_CLOUD_DISCOVERY_ENABLED=true
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
