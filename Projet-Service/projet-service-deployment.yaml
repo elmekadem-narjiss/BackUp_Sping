@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projet-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projet-service
+  template:
+    metadata:
+      labels:
+        app: projet-service
+    spec:
+      containers:
+        - name: projet-service
+          image: nonoel/projet-service:latest  # Remplacez par l'image Docker du Docker Hub
+          ports:
+            - containerPort: 8083  # Port pour le service Projet
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: projet-service
+spec:
+  selector:
+    app: projet-service  # Le label doit correspondre à celui du Deployment
+  ports:
+    - protocol: TCP
+      port: 8083           # Port exposé sur le service
+      targetPort: 8083     # Port sur lequel le conteneur écoute
+  type: ClusterIP          # Accès interne dans le cluster uniquement

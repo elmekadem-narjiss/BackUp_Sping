@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enseignant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enseignant-service
+  template:
+    metadata:
+      labels:
+        app: enseignant-service
+    spec:
+      containers:
+        - name: enseignant-service
+          image: nonoel/enseignant-service:latest  # Remplacez par l'image Docker du Docker Hub
+          ports:
+            - containerPort: 8081  # Port pour le service Enseignant
+          env:
+              - name: SPRING_APPLICATION_NAME
+                value: "Enseignant-Service"
+              - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+                value: "http://discovery-service:8761/eureka"  # URL du serveur Eureka
+              - name: EUREKA_CLIENT_FETCH_REGISTRY
+                value: "true"
+              - name: EUREKA_CLIENT_REGISTER_WITH_EUREKA
+                value: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: enseignant-service
+spec:
+  selector:
+    app: enseignant-service  # Le label doit correspondre à celui du Deployment
+  ports:
+    - protocol: TCP
+      port: 8081           # Port exposé sur le service
+      targetPort: 8081     # Port sur lequel le conteneur écoute
+  type: ClusterIP          # Accès interne dans le cluster uniquement

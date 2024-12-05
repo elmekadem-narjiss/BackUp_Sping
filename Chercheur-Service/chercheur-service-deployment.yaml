@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chercheur-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chercheur-service
+  template:
+    metadata:
+      labels:
+        app: chercheur-service
+    spec:
+      containers:
+        - name: chercheur-service
+          image: nonoel/chercheur-service:latest  # Remplacez par l'image Docker du Docker Hub
+          ports:
+            - containerPort: 8082  # Port pour le service Chercheur
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chercheur-service
+spec:
+  selector:
+    app: chercheur-service  # Assurez-vous que ce label correspond à celui dans votre déploiement
+  ports:
+    - protocol: TCP
+      port: 8082           # Port exposé sur le service
+      targetPort: 8082     # Port sur lequel le conteneur écoute
+  type: ClusterIP          # Utilisez ClusterIP pour un accès interne dans le cluster

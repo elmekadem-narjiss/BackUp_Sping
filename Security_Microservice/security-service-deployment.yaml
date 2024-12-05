@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: security-service
+  template:
+    metadata:
+      labels:
+        app: security-service
+    spec:
+      containers:
+        - name: security-service
+          image: nonoel/security-service:latest  # Remplacez par l'image Docker du Docker Hub
+          ports:
+            - containerPort: 8080  # Port pour le service Security (s'il en a un spécifique)
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-service
+spec:
+  selector:
+    app: security-service  # Le label doit correspondre à celui du Deployment
+  ports:
+    - protocol: TCP
+      port: 8080           # Port exposé sur le service
+      targetPort: 8080     # Port sur lequel le conteneur écoute
+  type: ClusterIP          # Accès interne dans le cluster uniquement
