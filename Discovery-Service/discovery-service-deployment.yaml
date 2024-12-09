@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: discovery-service
+  namespace: default  # Remplacez "default" par votre namespace si différent
 spec:
   replicas: 1
   selector:
@@ -14,20 +15,34 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: nonoel/discovery-service:latest  # Remplacez par l'image Docker du Docker Hub
+          image: nonoel/discovery-service:latest
           ports:
-            - containerPort: 8761  # Port pour le service Discovery (Eureka)
+            - containerPort: 8761
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8761
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8761
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      restartPolicy: Always
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: discovery-service
+  namespace: default  # Remplacez "default" par votre namespace si différent
 spec:
   selector:
-    app: discovery-service  # Le label doit correspondre à celui du Deployment
+    app: discovery-service
   ports:
     - protocol: TCP
-      port: 8761           # Port exposé sur le service
-      targetPort: 8761     # Port sur lequel le conteneur écoute
-  type: ClusterIP          # Accès interne dans le cluster uniquement
+      port: 8761
+      targetPort: 8761
+  type: LoadBalancer
